@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # Normalize input (X) and preprocessed output (Y)
     X_norm = normalize(X)
-    Y_norm = normalize(preprocess(Y))
+    Y_norm = normalize(Y_prep)
 
     # Return coefficients with normalized input and output
     slope, intercept = linear_regression(X_norm, Y_norm)
