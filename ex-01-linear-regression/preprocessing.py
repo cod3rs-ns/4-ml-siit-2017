@@ -54,8 +54,3 @@ def preprocess(data, method=(lambda val: np.log(val))):
     :return: preprocessed data
     """
     return map(method, data)
-
-
-def remove_outliers():
-    # TODO Implement automatically recognition of outliers
-    pass
