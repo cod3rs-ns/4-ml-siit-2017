@@ -39,7 +39,7 @@ def normalize(data):
     :param data: list of data which should be normalized
     :return: normalized data
     """
-    mean = np.mean(data)
+    mean = np.median(data)
     std = np.std(data)
 
     return map(lambda val: (val - mean)/std, data)

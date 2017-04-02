@@ -1,6 +1,6 @@
 import numpy as np
 import plotter
-
+import pandas
 from preprocessing import read_file, preprocess, normalize
 from lin_reg import linear_regression, rmse
 from util import get_arg_or_else, hello
