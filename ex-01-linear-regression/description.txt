@@ -14,3 +14,14 @@ Solution description:
   '(y - mean)/std'.
 
   We removed outliers manually (3 of them). After evaluating our algorithm using RMSE method our error is 1.86171.
+
+
+Alternative methods:
+  We also try to fit model with RANSAC (Random Sample Consensus) algorithm, because we wanted to use algorithm that
+  is resistant to outliers. The main problem in using this algorithm was range of achieved RMSE ... from 1.1 to 9.0.
+
+  Why this happens?
+
+  First of all, result of algorithm depends on initial random chosen points. Also, our data distribution (a lot grouped data
+  in vertical lines) made that the consensus set is always same, but with different slope and intercept which change
+  our model a lot.
