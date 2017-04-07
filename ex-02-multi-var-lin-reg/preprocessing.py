@@ -1,4 +1,4 @@
-def feature_normalization(data, binary, nominal, range_cols=None, norm_params=[], feature_to_predict='Grade'):
+def feature_normalization(data, binary, nominal, range_cols=None, norm_params=[], feature_to_predict='grade'):
     """
     Function which takes list of data and normalize numeric data and
     convert nominal and binary data to appropriate numerical representation

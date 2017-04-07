@@ -1,6 +1,7 @@
 # coding=utf-8
 import operator
 from math import sqrt
+from functools import reduce
 
 
 class KNeighborsRegressor(object):
@@ -37,11 +38,7 @@ class KNeighborsRegressor(object):
         :param y: input vector of features for one point
         :return: euclidean distance between two points
         """
-        distance = 0
-        for i in range(len(x)):
-            distance += (x[i] - y[i]) ** 2
-
-        return sqrt(distance)
+        return sqrt(reduce(operator.add, map(lambda a, b: (a - b) ** 2, x, y)))
 
     @staticmethod
     def manhattan_distance(x, y):
@@ -52,11 +49,7 @@ class KNeighborsRegressor(object):
         :param y: input vector of features for one point
         :return: manhattan distance between two points
         """
-        distance = 0
-        for i in range(len(x)):
-            distance += abs(x[i] - y[i])
-
-        return distance
+        return reduce(operator.add, map(lambda a, b: abs(a - b), x, y))
 
     def get_k_nearest_neighbour(self, unmarked_data):
         """
