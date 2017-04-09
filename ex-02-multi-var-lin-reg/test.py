@@ -39,14 +39,14 @@ if __name__ == '__main__':
     feature_normalization(data, binary=binary_features, nominal=nominal_features, norm_params=norm_params)
 
     # Separate data to validation and train
-    split_value = int(len(data) * 0.2)
-    validation, train = data.ix[:split_value, :], data.ix[split_value:, :]
+    split_value = int(len(data) * 0.8)
+    train, validation = data.ix[:split_value, :], data.ix[split_value:, :]
 
     x_train, y_train = train.ix[:, :-1], train.ix[:, -1]
-    x_validation, y_validation = train.ix[:, :-1], train.ix[:, -1]
+    x_validation, y_validation = validation.ix[:, :-1], validation.ix[:, -1]
 
     # Create KNN model for data prediction
-    knn = KNeighborsRegressor(k=2)
+    knn = KNeighborsRegressor(k=19)
     # Set training data
     knn.fit(x_train.values.tolist(), y_train.values.tolist())
     # Predict values for validation data

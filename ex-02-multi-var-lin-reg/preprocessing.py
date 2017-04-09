@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def feature_normalization(data, binary, nominal, range_cols=None, norm_params=[], feature_to_predict='grade'):
     """
     Function which takes list of data and normalize numeric data and
@@ -22,14 +25,14 @@ def feature_normalization(data, binary, nominal, range_cols=None, norm_params=[]
         col_values = data[col_name]
 
         if not rp_initialized:
-            min_value = min(col_values)
-            max_value = max(col_values)
-            norm_params.append((min_value, max_value))
+            mean = np.mean(col_values)
+            std = np.std(col_values)
+            norm_params.append((mean, std))
         else:
-            min_value = norm_params[i][0]
-            max_value = norm_params[i][1]
+            mean = norm_params[i][0]
+            std = norm_params[i][1]
 
-        data[col_name] = (col_values - min_value) / (max_value - min_value)
+        data[col_name] = (col_values - mean) / std
 
     # Set binary feature values from string to 0 or 1
     for col_name, bin_values in binary.items():

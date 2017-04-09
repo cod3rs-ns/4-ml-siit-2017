@@ -76,8 +76,7 @@ class KNeighborsRegressor(object):
 
         return k_neighbours
 
-    @staticmethod
-    def vote(k_neighbours):
+    def vote(self, k_neighbours):
         """
         Function that find most voted class
 
@@ -85,17 +84,7 @@ class KNeighborsRegressor(object):
         :return: name of the class that has most occurrences
         """
 
-        votes = {}
-
-        for label in k_neighbours:
-            if label in votes:
-                votes[label] += 1
-            else:
-                votes[label] = 1
-
-        sorted_votes = sorted(votes.iteritems(), key=operator.itemgetter(1), reverse=True)
-
-        return sorted_votes[0][0]
+        return sum(k_neighbours) / float(self.k)
 
     def predict(self, x):
         """
