@@ -43,7 +43,7 @@
   |  ...  |    1    |       0      |     0    |    0    |  ... |
   
 ## Results
-  From experimental analysis we achieved best results with **k**=2 (number of neighbours that
+  From experimental analysis we achieved best results with **k**=19 (number of neighbours that
   should participate in finding best class for one input vector).
   
   We separate our training data in train and validation set **(80/20)** and evaluate **RMSE**.  
