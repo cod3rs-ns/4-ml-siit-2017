@@ -2,17 +2,16 @@
 import operator
 from math import sqrt
 from functools import reduce
+from sklearn.metrics import mean_squared_error
 
 
 class KNeighborsRegressor(object):
-    def __init__(self, k, distance='L2'):
+    def __init__(self, k, distance):
         """
         Constructor of KNeighborsRegressor
 
         :param k: number of neighbors to use
-        :param distance: the distance metric to use for evaluation, possible values:
-                    'L1': manhattan_distance
-                    'L2': euclidean distance
+        :param distance: function which we use for distance evaluating
         """
         self.k = k
         self.distance = distance
@@ -60,18 +59,14 @@ class KNeighborsRegressor(object):
         """
         dists = {}
 
-        for i in range(len(self.x)):
-            if self.distance == "L1":
-                d = self.manhattan_distance(self.x[i], unmarked_data)
-            else:
-                d = self.euclidean_distance(self.x[i], unmarked_data)
-            dists[str(i)] = d
+        for i in xrange(len(self.x)):
+            dists[str(i)] = self.distance(self.x[i], unmarked_data)
 
         # Sort all distances to get nearest points
         sorted_dists = sorted(dists.iteritems(), key=operator.itemgetter(1))
 
         k_neighbours = []
-        for i in range(self.k):
+        for i in xrange(self.k):
             k_neighbours.append(self.y[int(sorted_dists[i][0])])
 
         return k_neighbours
@@ -95,9 +90,14 @@ class KNeighborsRegressor(object):
         """
         results = []
 
-        for i in range(len(x)):
+        for i in xrange(len(x)):
             k_neighbours = self.get_k_nearest_neighbour(x[i])
             result = self.vote(k_neighbours)
             results.append(result)
 
         return results
+
+    @staticmethod
+    def rmse(y, y_predicted):
+        return sqrt(mean_squared_error(y, y_predicted))
+

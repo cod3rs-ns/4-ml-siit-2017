@@ -16,13 +16,15 @@
   |:----------:|:----------:|:----------------------------------:|
   | sex        | binary     | [F, M]                             | 
   | Medu       | numeric    | [0-4]                              |
-  | reason     | nominal    | [ home, reputation, course, other] |
+  | reason     | nominal    | [home, reputation, course, other]  |
   | studytime  | numeric    | [1-4]                              |
   | schoolsup  | binary     | [yes, no]                          |
   | higher     | binary     | [yes, no]                          |
   | goout      | numeric    | [1-5]                              |
   | Dalc       | numeric    | [1-5]                              |
   | Walc       | numeric    | [1-5]                              |
+  | Internet   | binary     | [yes, no]                          |
+  | Guardian   | nominal    | [mother, father, other]            |
 
   Main work was based on finding appropriate features and preproccessing data for those features.
 

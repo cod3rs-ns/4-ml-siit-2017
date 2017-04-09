@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.metrics import mean_squared_error
 
 from knn_regressor import KNeighborsRegressor
 from preprocessing import feature_normalization
@@ -46,18 +45,22 @@ if __name__ == '__main__':
     x_validation, y_validation = validation.ix[:, :-1], validation.ix[:, -1]
 
     # Create KNN model for data prediction
-    knn = KNeighborsRegressor(k=19)
+    knn = KNeighborsRegressor(k=19, distance=KNeighborsRegressor.euclidean_distance)
     # Set training data
     knn.fit(x_train.values.tolist(), y_train.values.tolist())
     # Predict values for validation data
     y_validation_pred = knn.predict(x_validation.values.tolist())
 
-    validation_rmse = mean_squared_error(y_validation.values.tolist(), y_validation_pred) ** 0.5
+    validation_rmse = KNeighborsRegressor.rmse(y_validation.values.tolist(), y_validation_pred)
     display_rmse(validation_rmse)
 
     # Read test data from file
     df_test = pd.read_csv(test_path)
-    test_data = df[selected_features]
+
+    # lower-case all column names
+    df_test.columns = map(str.lower, df_test.columns)
+
+    test_data = df_test[selected_features]
 
     # Normalization of test features
     feature_normalization(test_data, binary=binary_features, nominal=nominal_features, norm_params=norm_params)
@@ -66,5 +69,5 @@ if __name__ == '__main__':
     y_test_pred = knn.predict(x_test.values.tolist())
 
     # Calculate RMSE for test data
-    test_rmse = mean_squared_error(y_true.values.tolist(), y_test_pred) ** 0.5
+    test_rmse = KNeighborsRegressor.rmse(y_true.values.tolist(), y_test_pred)
     display_rmse(test_rmse, "test")
