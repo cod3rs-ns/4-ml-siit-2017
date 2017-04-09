@@ -31,7 +31,7 @@
 ### Preprocessing data
 
   All features from ***numeric*** category are normalized using formula:  
-  * (x<sub>i</sub> - mean(x)) / (std(x))
+  * (x<sub>i</sub> - median(x)) / (std(x))
   
   We also substitute string values from binary features with 0 and 1, to get numerical representation.  
   
@@ -47,4 +47,4 @@
   should participate in finding best class for one input vector).
   
   We separate our training data in train and validation set **(80/20)** and evaluate **RMSE**.  
-   **RMSE** on validation set was **2.53**. 
+   **RMSE** on validation set was **2.52**.

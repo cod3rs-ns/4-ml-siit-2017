@@ -25,14 +25,14 @@ def feature_normalization(data, binary, nominal, range_cols=None, norm_params=[]
         col_values = data[col_name]
 
         if not rp_initialized:
-            mean = np.mean(col_values)
+            median = np.median(col_values)
             std = np.std(col_values)
-            norm_params.append((mean, std))
+            norm_params.append((median, std))
         else:
-            mean = norm_params[i][0]
+            median = norm_params[i][0]
             std = norm_params[i][1]
 
-        data[col_name] = (col_values - mean) / std
+        data[col_name] = (col_values - median) / std
 
     # Set binary feature values from string to 0 or 1
     for col_name, bin_values in binary.items():
