@@ -6,6 +6,7 @@ from util import get_arg_or_else, hello, display_rmse
 
 if __name__ == '__main__':
     test_path = get_arg_or_else(1, "data/test.csv")
+    validation_set_percent = 1 - float(get_arg_or_else(2, 100))/100.0
     pd.options.mode.chained_assignment = None
 
     hello()
@@ -37,22 +38,31 @@ if __name__ == '__main__':
     # Normalization of features
     feature_normalization(data, binary=binary_features, nominal=nominal_features, norm_params=norm_params)
 
-    # Separate data to validation and train
-    split_value = int(len(data) * 0.8)
-    train, validation = data.ix[:split_value, :], data.ix[split_value:, :]
+    split = validation_set_percent > 0
+
+    if split:
+        # Separate data to validation and train
+        split_value = int(len(data) * validation_set_percent)
+        train, validation = data.ix[:split_value, :], data.ix[split_value:, :]
+    else:
+        train = data.ix[:, :]
 
     x_train, y_train = train.ix[:, :-1], train.ix[:, -1]
-    x_validation, y_validation = validation.ix[:, :-1], validation.ix[:, -1]
+
+    if split:
+        x_validation, y_validation = validation.ix[:, :-1], validation.ix[:, -1]
 
     # Create KNN model for data prediction
     knn = KNeighborsRegressor(k=19, distance=KNeighborsRegressor.euclidean_distance)
     # Set training data
     knn.fit(x_train.values.tolist(), y_train.values.tolist())
-    # Predict values for validation data
-    y_validation_pred = knn.predict(x_validation.values.tolist())
 
-    validation_rmse = KNeighborsRegressor.rmse(y_validation.values.tolist(), y_validation_pred)
-    display_rmse(validation_rmse)
+    if split:
+        # Predict values for validation data
+        y_validation_pred = knn.predict(x_validation.values.tolist())
+
+        validation_rmse = KNeighborsRegressor.rmse(y_validation.values.tolist(), y_validation_pred)
+        display_rmse(validation_rmse)
 
     # Read test data from file
     df_test = pd.read_csv(test_path)
