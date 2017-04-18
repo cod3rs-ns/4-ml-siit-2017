@@ -60,11 +60,12 @@ if __name__ == "__main__":
         x_validation['age'] = make_intervals(x_validation['age'], age_intervals)
         x_validation['children'] = make_intervals(x_validation['children'], age_intervals)
 
-    # Initialize Naive Bayes
+    # Initialize Naive Bayes and setup parameters
     x = x_train.values.tolist()
     y = y_train.values.tolist()
     nb = NaiveBayes(x, y, [0, 1])
     nb.with_smoothing(1)
+    # nb.with_continuous_variables([0, 3])
 
     if split:
         # Evaluate on validation set
