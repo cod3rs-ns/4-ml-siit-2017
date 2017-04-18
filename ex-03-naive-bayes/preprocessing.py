@@ -6,7 +6,7 @@ def interval_category_splitter(x, intervals):
     :param intervals: boundary values of intervals we want to split
     :return: concrete interval value as string
     """
-    if x == '?':
+    if '?' == x:
         return '?'
 
     return str(len(filter(lambda _: int(x) > _, intervals)))
@@ -32,3 +32,13 @@ def remove_non_values(data, char='?'):
     :return: clean data
     """
     return map(lambda _: int(_), filter(lambda _: _ != char, data))
+
+
+def to_float(data):
+    """
+    Function which converts all list values to float
+    
+    :param data: clear data with mixed values (strings)
+    :return: list of floats
+    """
+    return map(lambda _: float(_), remove_non_values(data))
