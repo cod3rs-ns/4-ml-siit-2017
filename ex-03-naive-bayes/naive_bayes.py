@@ -13,6 +13,21 @@ class NaiveBayes(object):
         self._train_inputs = train_inputs
         self._train_outputs = train_outputs
         self._hypotheses = hypotheses
+        # Number of features
+        self._features_no = len(self._train_inputs[0])
+        # Number of training examples
+        self._examples_no = len(self._train_inputs)
+        # No smoothing
+        self._alpha = 0
+
+    def with_smoothing(self, alpha):
+        """
+        Method that sets smoothing param to Naive Bayes
+        
+        :param alpha: smoothing param
+        :return: 
+        """
+        self._alpha = alpha
 
     def predict(self, x, debug=False):
         """
@@ -39,19 +54,52 @@ class NaiveBayes(object):
         return sorted(output.items(), key=operator.itemgetter(1))[-1][0]
 
     def _get_probability(self, hypothesis):
+        """
+        Provides probabilistic of current hypothesis over the space
+        
+        :param hypothesis: concrete hypothesis we want to find probability for
+        :return: probability of provided hypothesis
+        """
         y = self._train_outputs
         return y.count(hypothesis) / (float(len(y)))
 
     def _get_probability_of_hypothesis_if_data(self, x, hypothesis):
+        """
+        Function that calculates probability of provided input
+        
+        :param x: input features
+        :param hypothesis: concrete output value we are finding probability for
+        :return: probability of 'hypothesis' for provided input 'x'
+        """
         probability = 1
-        n = self._train_outputs.count(hypothesis)
-        # For each attribute
-        for i in xrange(len(self._train_inputs[0])):
-            s = 0
-            for j in xrange(len(self._train_inputs)):
-                if self._train_outputs[j] == hypothesis and str(self._train_inputs[j][i]) == str(x[i]):
-                    s += 1
-
-            probability *= float(s) / n
+        # For each feature
+        for feature in xrange(self._features_no):
+            probability *= self._feature_probability(feature, x[feature], hypothesis)
 
         return probability
+
+    def _feature_probability(self, feature, x, hypothesis, type="discrete"):
+        """
+        Function which calculates probability for each feature
+        
+        :param feature: index of concrete feature
+        :param x: value of feature from provided input
+        :param hypothesis: hypothesis we calculate probability for
+        :param type: feature type ['discrete' or 'continuous']
+        :return: probability of concrete input feature value
+        """
+        total_hypothesis_data = self._train_outputs.count(hypothesis)
+        features_in_hypothesis = 0
+
+        possible_feature_values = set()
+
+        # Find probability that provided input feature is in provided training set for provided hypothesis
+        for j in xrange(self._examples_no):
+            possible_feature_values.add(self._train_inputs[j][feature])
+            if self._train_outputs[j] == hypothesis and str(self._train_inputs[j][feature]) == str(x):
+                features_in_hypothesis += 1
+
+        possible_feature_values = len(possible_feature_values)
+
+        return (float(features_in_hypothesis) + self._alpha) / \
+               (total_hypothesis_data + self._alpha * possible_feature_values)
