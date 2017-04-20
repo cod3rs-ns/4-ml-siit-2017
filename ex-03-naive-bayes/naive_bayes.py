@@ -149,7 +149,7 @@ class NaiveBayes(object):
             sigma = std(feature_x)
             mi = median(feature_x)
 
-            return exp(- (float(x) - mi)**2 / (2 * sigma**2))/(sqrt(2*pi) * sigma)
+            return exp(- (float(x) - mi) ** 2 / (2 * sigma ** 2)) / (sqrt(2 * pi) * sigma)
 
         # When provided value for input value is '?' (added because of 'random' validation set
         except ValueError:

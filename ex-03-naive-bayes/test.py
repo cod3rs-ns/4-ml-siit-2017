@@ -26,8 +26,8 @@ def get_test_data(path):
 
 if __name__ == "__main__":
     test_path = get_arg_or_else(1, "data/test.csv")
-    validation_set_percent = 1 - float(get_arg_or_else(2, 20)) / 100.0
-    create_intervals = get_arg_or_else(3, False)
+    validation_set_percent = 1 - float(get_arg_or_else(2, 100)) / 100.0
+    make_features_discrete = get_arg_or_else(3, False)
 
     hello()
 
@@ -49,26 +49,30 @@ if __name__ == "__main__":
     if split:
         x_validation, y_validation = validation.ix[:, :-1], validation.ix[:, -1]
 
-    if create_intervals:
-        # TODO You must to specify your intervals
-        age_intervals = [0, 10, 20, 30, 40]
-        children_intervals = [0, 2, 4, 6]
+    if make_features_discrete:
+        # You must to specify your intervals!
+        # These current intervals showed best results, they are not random, they are selected by looking at plots and
+        # total count for each value
+        age_intervals = [19, 22, 32, 36, 39]
+        children_intervals = [0, 1, 2, 3]
 
         x_train['age'] = make_intervals(x_train['age'], age_intervals)
         x_train['children'] = make_intervals(x_train['children'], children_intervals)
 
         x_validation['age'] = make_intervals(x_validation['age'], age_intervals)
-        x_validation['children'] = make_intervals(x_validation['children'], age_intervals)
+        x_validation['children'] = make_intervals(x_validation['children'], children_intervals)
 
     # Initialize Naive Bayes and setup parameters
     x = x_train.values.tolist()
     y = y_train.values.tolist()
     nb = NaiveBayes(x, y, [0, 1])
     nb.with_smoothing(1)
+
+    # SHOULD be uncommented to use Gaussian Probability Method for continuous features
     # nb.with_continuous_variables([0, 3])
 
+    # ========== Evaluation on validation set ========== #
     if split:
-        # Evaluate on validation set
         total_data = len(y_validation.values.tolist())
         true_predicts = 0
         for x, y in zip(x_validation.values.tolist(), y_validation.values.tolist()):
@@ -78,7 +82,7 @@ if __name__ == "__main__":
 
         print "Accuracy for validation set is {0:.2f}%.".format((100. * true_predicts) / total_data)
 
-    # Evaluate on testing set
+    # ========== Evaluation on test set ========== #
     test_x, test_y = get_test_data(test_path)
 
     total_data = len(test_y)
@@ -88,4 +92,4 @@ if __name__ == "__main__":
         if predicted_value == y:
             true_predicts += 1
 
-    print "Accuracy for test set is {0:.2f}%.".format((100.*true_predicts)/total_data)
+    print "Accuracy for test set is {0:.2f}%.".format((100. * true_predicts) / total_data)
