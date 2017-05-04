@@ -10,15 +10,15 @@ from util import get_arg_or_else, hello
 nan_mean = partial(pd.DataFrame.mean, skipna=True)
 
 
-def preprocess_data(df, mean_values=None):
+def preprocess_data(data_frame, mean_values=None):
     """
     Function that prepare data for evaluation (interpolation of missing values and normalization)
-    :param df: pandas data frame
+    :param data_frame:  pandas data frame
     :param mean_values: dict of mean values for each column
     :return: normalized data frame without missing values
     """
     # replace missing values with NaN
-    data = df.replace('?', pd.np.nan)
+    data = data_frame.replace('?', pd.np.nan)
     data = data.astype('float64')
 
     # interpolate missing values with mean value

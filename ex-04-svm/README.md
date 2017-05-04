@@ -3,14 +3,13 @@
 ## Technologies and libs
 - Python 2.7.x
 - pandas
-- numpy
 - scikit-learn
 
 
 ## Solution description
   We use **SVM (Support Vector Machine)** algorithm to predict output **class** of tumor
   (0-benign or 1-malign) for input data that contains 9 features. We tried all possible
-  kernels from scikit-learn library and we assumed best results with **sigmoid** function.
+  kernels from scikit-learn library and we achieved best results with **sigmoid** function.
   
   | Name       | Category   | Values                             |
   |:----------:|:----------:|:----------------------------------:|
@@ -25,10 +24,10 @@
   | mitoses    | numeric    | [1, 10]                            |
  
 ### Data preprocessing 
-  We realized that we have a lot of missing data in our train data. We conclude that
+  We realized that we have a lot of missing values in our train data. We concluded that
   all missing values are values from feature **nuclei**. Because of that we tried to remove
   this feature from our model, but the result was worse. Also we tried to remove only samples
-  with missing values, but we also did not improve model. We had best results when we interpolate
+  with missing values, but we also did not improve model. We achieved best results when we interpolate
   missing values with **mean** value of feature. 
   
   Also we had better results with data normalization using formula:  
