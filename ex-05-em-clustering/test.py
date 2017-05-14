@@ -8,14 +8,14 @@ from util import hello, get_arg_or_else
 
 
 def get_values_of_test_image(path):
-    data = {
+    image_params = {
         'a_h': [],
         'b_s': [],
         'c_v': [],
         'd_path': []
     }
-    read_image(path, data)
-    return data
+    read_image(path, image_params)
+    return image_params
 
 
 if __name__ == "__main__":
@@ -29,10 +29,11 @@ if __name__ == "__main__":
     input_features = pd.read_csv("data/processed.csv")
     data = input_features.drop('d_path', axis=1).astype(float)
 
-    mu = [[0.557450406909, 0.570965982011, 0.631242031936],  # cloudy_sky
-          [0.297082985839, 0.536981188154, 0.644342852772],  # rivers
+    # Initial means for each cluster obtained from human's choice representative examples from data set
+    mu = [[0.557450406909, 0.570965982011, 0.631242031936],   # cloudy_sky
+          [0.297082985839, 0.536981188154, 0.644342852772],   # rivers
           [0.0627345842156, 0.934576709652, 0.780241045252],  # sunsets
-          [0.302649970548, 0.329837908527, 0.580027363411]]  # trees_and_forests
+          [0.302649970548, 0.329837908527, 0.580027363411]]   # trees_and_forests
 
     clusters = ['cloudy_sky', 'rivers', 'sunsets', 'trees_and_forests']
 
@@ -43,7 +44,7 @@ if __name__ == "__main__":
     test_data = pd.read_csv(test_path)
     file_paths, expected_clusters = test_data.ix[:, 0], test_data.ix[:, 1]
 
-    total_data = len(expected_clusters)
+    total_data = len(file_paths)
     true_predicts = 0
 
     for file_path, expected_cluster in zip(file_paths.values, expected_clusters.values):

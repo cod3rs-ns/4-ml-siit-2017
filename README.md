@@ -9,3 +9,5 @@ Repository for homework on Machine Learning course SIIT 2017.
 1. **Linear Regression**
 2. **Multi variable Linear Regression**
 3. **Naive Bayes classifier**
+4. **Support vector machines**
+5. **Expectation maximization clustering**

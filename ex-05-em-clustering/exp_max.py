@@ -17,17 +17,18 @@ class ExpectationMaximization:
         # n = number of input data, d = number of features for input data
         n, d = X.shape
 
-        # randomize means
+        # Randomize 'means' if there are no provided
         if not means:
             random_mu = np.random.choice(n, self._k, False)
             mu = X[random_mu, :]
         else:
             mu = means
 
-        # initialize the covariance matrices for each gaussian
+        # Initialize identity matrix as covariance for every cluster
         covariance = [np.eye(d)] * self._k
 
-        # initialize the probabilities/weights for each gaussian
+        # Initialize weights for each cluster - [0.25, 0.25, 0.25, 0.25]
+        # Represents knowledge of cluster instances
         w = [1.0 / self._k] * self._k
 
         # responsibility matrix is initialized to all zeros
@@ -52,7 +53,7 @@ class ExpectationMaximization:
 
                 w[ci] = 1. / n * n_ks[ci]
 
-            # Check if algorithm has not significant changes
+            # Check if algorithm has significant changes
             if np.sum(np.absolute(np.array(mu) - np.array(old_mu))) < self._eps:
                 break
 
