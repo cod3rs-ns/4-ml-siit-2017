@@ -3,7 +3,6 @@
 from collections import namedtuple
 
 import numpy as np
-import pandas as pd
 import pylab as plt
 
 
@@ -13,19 +12,17 @@ class ExpectationMaximization:
         self._eps = eps
         self.results = None
 
-    def fit(self, X, max_iters=1000):
+    def fit(self, X, max_iters=1000, means=None):
 
         # n = number of data-points, d = dimension of data points
         n, d = X.shape
 
         # randomize means
-        # random_mu = np.random.choice(n, self._k, False)
-        # mu = X[random_mu, :]
-
-        # some average values for classes 'cloudy_sky', 'forest', 'sunset' and 'river in that particular order
-        mu = [[0.557450406909, 0.570965982011, 0.631242031936], [0.297082985839, 0.536981188154, 0.644342852772, ],
-              [0.0627345842156, 0.934576709652, 0.780241045252], [0.302649970548, 0.329837908527, 0.580027363411]]
-        print mu
+        if not means:
+            random_mu = np.random.choice(n, self._k, False)
+            mu = X[random_mu, :]
+        else:
+            mu = means
 
         # initialize the covariance matrices for each gaussian
         covariance = [np.eye(d)] * self._k
@@ -99,7 +96,7 @@ class ExpectationMaximization:
         plt.plot(self.results.log_likelihoods)
         plt.title('Log Likelihood vs iteration plot')
         plt.xlabel('Iterations')
-        plt.ylabel('log likelihood')
+        plt.ylabel('Log likelihood')
         plt.show()
 
     def predict(self, data):
@@ -110,63 +107,3 @@ class ExpectationMaximization:
         probabilities = np.array(
             [w * p(mu, s) for mu, s, w in zip(self.results.mu, self.results.covariance, self.results.w)])
         return probabilities / np.sum(probabilities)
-
-
-if __name__ == "__main__":
-    b = pd.read_csv("data/processed.csv")
-    x = b.drop('d_path', axis=1)
-    x = x.astype(float)
-    df_normalized = (x - x.min()) / (x.max() - x.min())
-    # print x.values[79]
-    a = df_normalized.values
-
-    epsilon = 0.01
-    clusters = 4
-    iters = 1000
-    gmm = ExpectationMaximization(clusters, epsilon)
-    results = gmm.fit(a, iters)
-    # gmm.plot_log_likelihood()
-
-    print "predictions ------------------------"
-    print gmm.predict(np.array(df_normalized.values[40]))
-    print b.iloc[40]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[0])))
-    print b.iloc[0]['d_path']
-
-    print 'zalazak'
-    print (gmm.predict(np.array(df_normalized.values[140])))
-    print b.iloc[140]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[161])))
-    print b.iloc[161]['d_path']
-
-    print (gmm.predict(np.array(df_normalized.values[581])))
-    print b.iloc[581]['d_path']
-
-    print "sume----------"
-    print (gmm.predict(np.array(df_normalized.values[79])))
-    print b.iloc[79]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[582])))
-    print b.iloc[582]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[583])))
-    print b.iloc[583]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[584])))
-    print b.iloc[584]['d_path']
-    print '-----------'
-
-    print "nebo-------------"
-    print (gmm.predict(np.array(df_normalized.values[71])))
-    print b.iloc[71]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[72])))
-    print b.iloc[72]['d_path']
-    print (gmm.predict(np.array(df_normalized.values[119])))
-    print b.iloc[119]['d_path']
-    print "----------------------"
-    # print "predictions ------------------------"
-    print("mu----------------------")
-    print (results.mu)
-    # print("sigma----------------------")
-    # print (params.Sigma)
-    # print("iters----------------------")
-    # print (params.num_iters)
-    print("w----------------------")
-    print ["{0:.2f}%".format(x * 100) for x in results.w]
