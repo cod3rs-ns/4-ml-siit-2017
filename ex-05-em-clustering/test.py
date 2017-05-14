@@ -1,41 +1,25 @@
-from preprocessing import read_image
+from os import listdir
+from os.path import isfile, join
+
 import pandas as pd
-from em import ExpectationMaximization
+
+from preprocessing import read_image
 
 if __name__ == "__main__":
-    '''
-    # proccessing images and save to csv file
 
-    from os import listdir
-    from os.path import isfile, join
-
+    # process images and save to csv file
     folder = "data/images"
-    onlyfiles = [f for f in listdir(folder) if isfile(join(folder, f))]
+    only_files = [f for f in listdir(folder) if isfile(join(folder, f))]
 
     data = {
-        'r': [],
-        'g': [],
-        'b': [],
-        #'l': [],
-        'bb': [],
-        'path': []
+        'a_h': [],
+        'b_s': [],
+        'c_v': [],
+        'd_path': []
     }
 
-    for f in onlyfiles:
+    for f in only_files:
         read_image(f, data)
 
     df = pd.DataFrame.from_dict(data)
     df.to_csv("data/processed.csv", sep=',', encoding='utf-8', index=False)
-    '''
-
-    clusters = ['a', 'b', 'c', 'd']
-
-    data = [
-        [1, 2, 3],
-        [1, 2, 3],
-        [2, 3, 4]
-    ]
-
-    em = ExpectationMaximization(clusters)
-    em.fit(data)
-    em.predict()

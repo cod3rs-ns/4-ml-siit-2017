@@ -9,8 +9,8 @@ import pylab as plt
 
 class ExpectationMaximization:
     def __init__(self, k=4, eps=0.0001):
-        self.k = k
-        self.eps = eps
+        self._k = k
+        self._eps = eps
         self.results = None
 
     def fit(self, X, max_iters=1000):
@@ -18,18 +18,24 @@ class ExpectationMaximization:
         # n = number of data-points, d = dimension of data points
         n, d = X.shape
 
-        random_mu = np.random.choice(n, self.k, False)
-        mu = X[random_mu, :]
+        # randomize means
+        # random_mu = np.random.choice(n, self._k, False)
+        # mu = X[random_mu, :]
+
+        # some average values for classes 'cloudy_sky', 'forest', 'sunset' and 'river in that particular order
+        mu = [[0.557450406909, 0.570965982011, 0.631242031936], [0.297082985839, 0.536981188154, 0.644342852772, ],
+              [0.0627345842156, 0.934576709652, 0.780241045252], [0.302649970548, 0.329837908527, 0.580027363411]]
+        print mu
 
         # initialize the covariance matrices for each gaussian
-        covariance = [np.eye(d)] * self.k
+        covariance = [np.eye(d)] * self._k
 
         # initialize the probabilities/weights for each gaussian
-        w = [1. / self.k] * self.k
+        w = [1. / self._k] * self._k
 
         # responsibility matrix is initialized to all zeros
         # we have responsibility for each of n points for each of k gaussian
-        responsibility = np.zeros((n, self.k))
+        responsibility = np.zeros((n, self._k))
 
         log_likelihoods = []
 
@@ -42,7 +48,7 @@ class ExpectationMaximization:
             # ================================================ E step ================================================ #
 
             # vectorized implementation of e-step equation to calculate the membership for each of k-gaussian
-            for ki in range(self.k):
+            for ki in range(self._k):
                 responsibility[:, ki] = w[ki] * probability(mu[ki], covariance[ki])
 
             # likelihood computation
@@ -62,7 +68,7 @@ class ExpectationMaximization:
             # ================================================ M step ================================================ #
 
             # calculate the new mean and covariance for each gaussian by utilizing the new responsibilities
-            for ki in range(self.k):
+            for ki in range(self._k):
                 # means
                 mu[ki] = 1. / n_ks[ki] * np.sum(responsibility[:, ki] * X.T, axis=1).T
                 x_mu = np.matrix(X - mu[ki])
@@ -76,7 +82,7 @@ class ExpectationMaximization:
             # check for convergence
             if len(log_likelihoods) < 2:
                 continue
-            if np.abs(log_likelihood - log_likelihoods[-2]) < self.eps:
+            if np.abs(log_likelihood - log_likelihoods[-2]) < self._eps:
                 break
 
         # bind all results together
@@ -108,7 +114,7 @@ class ExpectationMaximization:
 
 if __name__ == "__main__":
     b = pd.read_csv("data/processed.csv")
-    x = b.drop('path', axis=1)
+    x = b.drop('d_path', axis=1)
     x = x.astype(float)
     df_normalized = (x - x.min()) / (x.max() - x.min())
     # print x.values[79]
@@ -123,44 +129,44 @@ if __name__ == "__main__":
 
     print "predictions ------------------------"
     print gmm.predict(np.array(df_normalized.values[40]))
-    print b.iloc[40]['path']
+    print b.iloc[40]['d_path']
     print (gmm.predict(np.array(df_normalized.values[0])))
-    print b.iloc[0]['path']
+    print b.iloc[0]['d_path']
 
     print 'zalazak'
     print (gmm.predict(np.array(df_normalized.values[140])))
-    print b.iloc[140]['path']
+    print b.iloc[140]['d_path']
     print (gmm.predict(np.array(df_normalized.values[161])))
-    print b.iloc[161]['path']
+    print b.iloc[161]['d_path']
 
     print (gmm.predict(np.array(df_normalized.values[581])))
-    print b.iloc[581]['path']
+    print b.iloc[581]['d_path']
 
     print "sume----------"
     print (gmm.predict(np.array(df_normalized.values[79])))
-    print b.iloc[79]['path']
+    print b.iloc[79]['d_path']
     print (gmm.predict(np.array(df_normalized.values[582])))
-    print b.iloc[582]['path']
+    print b.iloc[582]['d_path']
     print (gmm.predict(np.array(df_normalized.values[583])))
-    print b.iloc[583]['path']
+    print b.iloc[583]['d_path']
     print (gmm.predict(np.array(df_normalized.values[584])))
-    print b.iloc[584]['path']
+    print b.iloc[584]['d_path']
     print '-----------'
 
     print "nebo-------------"
     print (gmm.predict(np.array(df_normalized.values[71])))
-    print b.iloc[71]['path']
+    print b.iloc[71]['d_path']
     print (gmm.predict(np.array(df_normalized.values[72])))
-    print b.iloc[72]['path']
+    print b.iloc[72]['d_path']
     print (gmm.predict(np.array(df_normalized.values[119])))
-    print b.iloc[119]['path']
+    print b.iloc[119]['d_path']
     print "----------------------"
     # print "predictions ------------------------"
-    # print("mu----------------------")
-    # print (params.mu)
+    print("mu----------------------")
+    print (results.mu)
     # print("sigma----------------------")
     # print (params.Sigma)
     # print("iters----------------------")
     # print (params.num_iters)
     print("w----------------------")
-    print (results.w)
+    print ["{0:.2f}%".format(x * 100) for x in results.w]
