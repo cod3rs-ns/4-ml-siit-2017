@@ -17,6 +17,6 @@ def hello():
     print "  SW F/2013    Dragutin Marjanovic"
     print
     print "You can run program with following arguments:"
-    print "     python test.py file_path_to_test_data"
+    print "     python test.py file_path_to_test_data proccess_data"
     print
     print

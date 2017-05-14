@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from collections import namedtuple
+from probability import probability_in_cluster, probability_of_one_input
+from copy import deepcopy
 
 import numpy as np
-import pylab as plt
 
 
 class ExpectationMaximization:
-    def __init__(self, k=4, eps=0.0001):
-        self._k = k
+    def __init__(self, clusters, eps=0.0001):
+        self._clusters = clusters
+        self._k = len(clusters)
         self._eps = eps
-        self.results = None
+        self.output_params = None
 
     def fit(self, X, max_iters=1000, means=None):
-
-        # n = number of data-points, d = dimension of data points
+        # n = number of input data, d = number of features for input data
         n, d = X.shape
 
         # randomize means
@@ -28,82 +28,48 @@ class ExpectationMaximization:
         covariance = [np.eye(d)] * self._k
 
         # initialize the probabilities/weights for each gaussian
-        w = [1. / self._k] * self._k
+        w = [1.0 / self._k] * self._k
 
         # responsibility matrix is initialized to all zeros
-        # we have responsibility for each of n points for each of k gaussian
-        responsibility = np.zeros((n, self._k))
+        # we have responsibility for each of n points for each of clusters
+        cluster_expectation = np.zeros((n, self._k))
 
-        log_likelihoods = []
+        for iteration in xrange(max_iters):
+            for ci in xrange(self._k):
+                cluster_expectation[:, ci] = w[ci] * probability_in_cluster(X, mu[ci], covariance[ci])
 
-        probability = lambda mean, cov: np.linalg.det(cov) ** -.5 ** (2 * np.pi) ** (-X.shape[1] / 2.) * np.exp(
-            -.5 * np.einsum('ij, ij -> i', X - mean, np.dot(np.linalg.inv(cov), (X - mean).T).T))
+            cluster_expectation = (cluster_expectation.T / np.sum(cluster_expectation, axis=1)).T
 
-        # start algorithm
-        while len(log_likelihoods) < max_iters:
+            n_ks = np.sum(cluster_expectation, axis=0)
 
-            # ================================================ E step ================================================ #
+            old_mu = deepcopy(mu)
 
-            # vectorized implementation of e-step equation to calculate the membership for each of k-gaussian
-            for ki in range(self._k):
-                responsibility[:, ki] = w[ki] * probability(mu[ki], covariance[ki])
+            for ci in xrange(self._k):
+                mu[ci] = 1.0 / n_ks[ci] * np.sum(cluster_expectation[:, ci] * X.T, axis=1).T
+                x_mu = np.matrix(X - mu[ci])
 
-            # likelihood computation
-            try:
-                log_likelihood = np.sum(np.log(np.sum(responsibility, axis=1)))
-            except Exception as e:
-                continue
+                covariance[ci] = np.array(1 / n_ks[ci] * np.dot(np.multiply(x_mu.T, cluster_expectation[:, ci]), x_mu))
 
-            log_likelihoods.append(log_likelihood)
+                w[ci] = 1. / n * n_ks[ci]
 
-            # normalize so that the responsibility matrix is row stochastic
-            responsibility = (responsibility.T / np.sum(responsibility, axis=1)).T
-
-            # the number of data-points belonging to each gaussian
-            n_ks = np.sum(responsibility, axis=0)
-
-            # ================================================ M step ================================================ #
-
-            # calculate the new mean and covariance for each gaussian by utilizing the new responsibilities
-            for ki in range(self._k):
-                # means
-                mu[ki] = 1. / n_ks[ki] * np.sum(responsibility[:, ki] * X.T, axis=1).T
-                x_mu = np.matrix(X - mu[ki])
-
-                # covariances
-                covariance[ki] = np.array(1 / n_ks[ki] * np.dot(np.multiply(x_mu.T, responsibility[:, ki]), x_mu))
-
-                # probabilities
-                w[ki] = 1. / n * n_ks[ki]
-
-            # check for convergence
-            if len(log_likelihoods) < 2:
-                continue
-            if np.abs(log_likelihood - log_likelihoods[-2]) < self._eps:
+            # Check if algorithm has not significant changes
+            if np.sum(np.absolute(np.array(mu) - np.array(old_mu))) < self._eps:
                 break
 
-        # bind all results together
-        self.results = namedtuple('results', ['mu', 'covariance', 'w', 'log_likelihoods', 'num_iters'])
-        self.results.mu = mu
-        self.results.covariance = covariance
-        self.results.w = w
-        self.results.num_iters = len(log_likelihoods)
-        self.results.log_likelihoods = log_likelihoods
-
-        return self.results
-
-    def plot_log_likelihood(self):
-        plt.plot(self.results.log_likelihoods)
-        plt.title('Log Likelihood vs iteration plot')
-        plt.xlabel('Iterations')
-        plt.ylabel('Log likelihood')
-        plt.show()
+        self.output_params = {"mu": mu, "cov": covariance, "w": w}
+        return self.output_params
 
     def predict(self, data):
-        p = lambda mean, covariance: np.linalg.det(covariance) ** - 0.5 * (2 * np.pi) ** (-len(data) / 2) * np.exp(
-            -0.5 * np.dot(data - mean, np.dot(np.linalg.inv(covariance),
-                                              data - mean)))
+        clusters_mu = self.output_params["mu"]
+        clusters_cov = self.output_params["cov"]
+        clusters_w = self.output_params["w"]
 
-        probabilities = np.array(
-            [w * p(mu, s) for mu, s, w in zip(self.results.mu, self.results.covariance, self.results.w)])
-        return probabilities / np.sum(probabilities)
+        probabilities = []
+        for cluster_mu, cluster_cov, cluster_w in zip(clusters_mu, clusters_cov, clusters_w):
+            probabilities.append(cluster_w * probability_of_one_input(data, cluster_mu, cluster_cov))
+
+        sum_of_probabilities = sum(probabilities)
+        input_probabilities = map(lambda x: x / sum_of_probabilities, probabilities)
+
+        cluster_index = input_probabilities.index(max(input_probabilities))
+        return self._clusters[cluster_index]
